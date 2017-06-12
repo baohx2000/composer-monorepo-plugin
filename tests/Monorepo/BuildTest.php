@@ -118,6 +118,20 @@ class BuildTest extends \PHPUnit_Framework_TestCase
         $this->assertContains(realpath(__DIR__ . '/../../') . '/bar/lib', $includePaths);
     }
 
+    public function testBuildWithBinCopyExampleProject()
+    {
+        $exampleDir = realpath(__DIR__ . '/../_fixtures/example-bin-copy');
+        chdir($exampleDir);
+        $build = new Build();
+        $build->build($exampleDir);
+
+        $this->assertTrue(file_exists("$exampleDir/bar/vendor/bin/test-bin"));
+        $this->assertFalse(is_link("$exampleDir/bar/vendor/bin/test-bin"));
+
+        $this->assertTrue(file_exists("$exampleDir/foo/baz/vendor/bin/test-bin"));
+        $this->assertFalse(is_link("$exampleDir/foo/baz/vendor/bin/test-bin"));
+    }
+
     protected function tearDown()
     {
         $fs = new Filesystem();

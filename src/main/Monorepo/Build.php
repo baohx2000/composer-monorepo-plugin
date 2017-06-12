@@ -96,13 +96,24 @@ class Build
 
                 foreach ($package->getBinaries() as $binary) {
 
-                    $binFile = $fullBinDir . '/' . basename($binary);
+                    // root / package / vendor / bin / binname
+                    $vendorBinTarget = $fullBinDir . '/' . basename($binary);
                     if ($config['bin-deploy-method'] == 'copy') {
-                        copy($rootDirectory. '/'. $binary, $binFile);
-                        chmod($binFile, fileperms($rootDirectory. '/'. $binary));
+                        $source = $rootDirectory. '/'. $binary;
+
+                        // root / package / vendor / vendor-name / package-name / binary-path
+                        //$target =  
+                        $target = $rootDirectory . '/' . $config['path'] . '/' . $binary;
+                        $targetDir = dirname($target);
+                        if (!file_exists($targetDir))
+                            mkdir($targetDir, 0777, true);
+
+                        copy($source, $target);
+                        chmod($target, fileperms($rootDirectory. '/'. $binary));
+                        symlink('../../'.$binary, $vendorBinTarget);
                     }
                     else {
-                        symlink($relativeRootDirectory . $binary, $binFile);
+                        symlink($relativeRootDirectory . $binary, $vendorBinTarget);
                     }
                 }
             }

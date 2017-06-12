@@ -100,13 +100,19 @@ class BuildTest extends \PHPUnit_Framework_TestCase
         $build = new Build();
         $build->build($exampleDir);
 
-        $this->assertTrue(file_exists("$exampleDir/bar/vendor/bin/test-bin"));
-        $this->assertFalse(is_link("$exampleDir/bar/vendor/bin/test-bin"));
-        $this->assertTrue(is_executable("$exampleDir/bar/vendor/bin/test-bin"));
+        $test = function($vendorBin, $vendorSource, $symlink)
+        {
+            $this->assertTrue(file_exists($vendorSource));
+            $this->assertTrue(is_executable($vendorSource));
 
-        $this->assertTrue(file_exists("$exampleDir/foo/baz/vendor/bin/test-bin"));
-        $this->assertFalse(is_link("$exampleDir/foo/baz/vendor/bin/test-bin"));
-        $this->assertTrue(is_executable("$exampleDir/foo/baz/vendor/bin/test-bin"));
+            $this->assertTrue(file_exists($vendorBin));
+            $this->assertTrue(is_link($vendorBin));
+            $link = readlink($vendorBin);
+            $this->assertEquals($symlink, $link);
+        };
+
+        $test("$exampleDir/bar/vendor/bin/test-bin", "$exampleDir/bar/vendor/test/bin/test-bin", '../../vendor/test/bin/test-bin');
+        $test("$exampleDir/foo/baz/vendor/bin/test-bin", "$exampleDir/foo/baz/vendor/test/bin/test-bin", '../../vendor/test/bin/test-bin');
     }
 
     protected function tearDown()

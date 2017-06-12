@@ -1,0 +1,4 @@
+{
+    "deps": ["vendor/test/bin"],
+    "bin-deploy-method": "copy"
+}

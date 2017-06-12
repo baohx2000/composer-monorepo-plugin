@@ -58,6 +58,10 @@
                     "description": "This is an array of files that are always required on every request."
                 }
             }
+        },
+        "bin-deploy-method": {
+            "enum": [ "symlink", "copy" ],
+            "description": "Deployment method for vendor binaries, symlink (Default) or copy.  Copy is useful for helping vendor binaries use the same autoload.php as the package"
         }
     }
 }

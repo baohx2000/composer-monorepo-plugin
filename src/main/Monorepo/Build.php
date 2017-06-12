@@ -94,11 +94,15 @@ class Build
 
             foreach ($localRepo->getPackages() as $package) {
 
-
                 foreach ($package->getBinaries() as $binary) {
 
                     $binFile = $fullBinDir . '/' . basename($binary);
-                    symlink($relativeRootDirectory . $binary, $binFile);
+                    if ($config['bin-deploy-method'] == 'copy') {
+                        copy( $rootDirectory. '/'. $binary, $binFile);
+                    }
+                    else {
+                        symlink($relativeRootDirectory . $binary, $binFile);
+                    }
                 }
             }
         }
@@ -185,6 +189,9 @@ class Build
             if (!isset($monorepoJson['deps-dev'])) {
                 $monorepoJson['deps-dev'] = array();
             }
+            if (!isset($monorepoJson['bin-deploy-method'])) {
+                $monorepoJson['bin-deploy-method'] = 'symlink';
+            }
 
             $packages[$file->getRelativePath()] = $monorepoJson;
         }
@@ -205,6 +212,7 @@ class Build
                     'autoload' => array(),
                     'deps' => array(),
                     'bin' => array(),
+                    'bin-deploy-method' => 'symlink',
                 );
 
                 if (isset($composerJson['autoload'])) {
@@ -231,6 +239,10 @@ class Build
                             $monorepoedComposerJson['bin'][] = $binary;
                         }
                     }
+                }
+
+                if (isset($composerJson['bin-deploy-method'])) {
+                    $monorepoedComposerJson['bin-deploy-method'] = $composerJson['bin-deploy-method'];
                 }
 
                 $packages['vendor/' . strtolower($name)] = $monorepoedComposerJson;

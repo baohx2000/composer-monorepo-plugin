@@ -98,7 +98,8 @@ class Build
 
                     $binFile = $fullBinDir . '/' . basename($binary);
                     if ($config['bin-deploy-method'] == 'copy') {
-                        copy( $rootDirectory. '/'. $binary, $binFile);
+                        copy($rootDirectory. '/'. $binary, $binFile);
+                        chmod($binFile, fileperms($rootDirectory. '/'. $binary));
                     }
                     else {
                         symlink($relativeRootDirectory . $binary, $binFile);

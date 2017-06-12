@@ -102,9 +102,11 @@ class BuildTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue(file_exists("$exampleDir/bar/vendor/bin/test-bin"));
         $this->assertFalse(is_link("$exampleDir/bar/vendor/bin/test-bin"));
+        $this->assertTrue(is_executable("$exampleDir/bar/vendor/bin/test-bin"));
 
         $this->assertTrue(file_exists("$exampleDir/foo/baz/vendor/bin/test-bin"));
         $this->assertFalse(is_link("$exampleDir/foo/baz/vendor/bin/test-bin"));
+        $this->assertTrue(is_executable("$exampleDir/foo/baz/vendor/bin/test-bin"));
     }
 
     protected function tearDown()

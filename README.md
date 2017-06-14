@@ -1,4 +1,5 @@
 # Composer Monorepo Plugin
+[![Build Status](https://travis-ci.org/jeichorn/composer-monorepo-plugin.svg?branch=master)](https://travis-ci.org/jeichorn/composer-monorepo-plugin)
 
     Note: this project is still experimental. Please provide feedback!
 

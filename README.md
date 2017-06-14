@@ -38,21 +38,15 @@ More details about reasoning on Gregory Szorc's blog:
 - [On Monlithic Repositories](http://gregoryszorc.com/blog/2014/09/09/on-monolithic-repositories/)
 - [Notes from Facebooks Developer Infrastructure at Scale F8 talk](http://gregoryszorc.com/blog/2015/03/28/notes-from-facebook's-developer-infrastructure-at-scale-f8-talk/)
 
-## Backwards Incompatible Changes in v0.12
+## Forked
 
-In v0.12 we removed the `fiddler` script and the possibility to build a PHAR archive.
-This project is now a first-class composer plugin only and requires Composer v1.1+
-for the `composer monorepo:` commands to be available.
-
-The `fiddler.json` files must be renamed to `monorepo.json`.
-
-Use v0.11.6 or lower if you don't want to break this in your project yet.
+This is a forked version of the original https://github.com/beberlei/composer-monorepo-plugin, since it was no longer under active development
 
 ## Installation
 
 Add the composer monorepo plugin to your root composer.json with:
 
-    $ composer require beberlei/composer-monorepo-plugin
+    $ composer require jeichorn/composer-monorepo-plugin
 
 It will be automatically added as a Composer plugin.
 
@@ -116,6 +110,10 @@ that borrows from `composer.json` format. The following keys are usable:
 - `deps` - configures the required dependencies in an array (no key-value pairs with versions)
   using the relative path to the project root directory as a package name.
 - `deps-dev` - configures the required dev dependencies
+- `bin-deploy-method` - symlink|copy, the standard method `symlink`, deploys vendor/bin scripts as symlinks 
+    to the parent vendor/bin.  This breaks cases where you want to use the autoload ands its dependencies
+    in a child repo.  Copy copies the bins into vendor/bin in the child and then symlinks them
+    so standard script discovery works.
 
 ## Git Integration for Builds
 

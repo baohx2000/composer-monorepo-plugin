@@ -36,10 +36,12 @@ use Composer\Package\Package;
 class Build
 {
     private $io;
+    private $factory;
 
     public function __construct(IOInterface $io = null)
     {
         $this->io = $io ?: new NullIO();
+        $this->factory = new Factory();
     }
 
     public function build($rootDirectory, $optimize = false, $noDevMode = false)
@@ -47,12 +49,16 @@ class Build
         $this->io->write(sprintf('<info>Generating autoload files for monorepo sub-packages %s dev-dependencies.</info>', $noDevMode ? 'without' : 'with'));
         $start = microtime(true);
 
-        $packages = $this->loadPackages($rootDirectory);
+        $composer = $this->createComposer($rootDirectory);
+        $baseConfig = $composer->getConfig();
+        $vendorDir = $baseConfig->get('vendor-dir', Config::RELATIVE_PATHS);
 
-        $evm = new EventDispatcher(new Composer(), $this->io);
+        $packages = $this->loadPackages($rootDirectory, $baseConfig);
+
+        $evm = new EventDispatcher($composer, $this->io);
         $generator = new AutoloadGenerator($evm, $this->io);
         $generator->setDevMode(!$noDevMode);
-        $installationManager = new InstallationManager();
+        $installationManager = $composer->getInstallationManager();
         $installationManager->addInstaller(new MonorepoInstaller());
 
         foreach ($packages as $packageName => $config) {
@@ -102,7 +108,7 @@ class Build
                         $source = $rootDirectory. '/'. $binary;
 
                         // root / package / vendor / vendor-name / package-name / binary-path
-                        //$target =  
+                        //$target =
                         $target = $rootDirectory . '/' . $config['path'] . '/' . $binary;
                         $targetDir = dirname($target);
                         if (!file_exists($targetDir))
@@ -170,8 +176,14 @@ class Build
         }
     }
 
-    public function loadPackages($rootDirectory)
+    public function loadPackages($rootDirectory, $baseConfig = null)
     {
+        if ($baseConfig == null) {
+            $composer = $this->createComposer($rootDirectory);
+            $baseConfig = $composer->getConfig();
+        }
+        $vendorDir = $baseConfig->get('vendor-dir', Config::RELATIVE_PATHS);
+
         $finder = new Finder();
         $finder->in($rootDirectory)
                ->exclude('vendor')
@@ -294,5 +306,11 @@ class Build
         }
 
         return json_decode($contents, true);
+    }
+
+    private function createComposer($rootDirectory)
+    {
+        $localConfigPath = file_exists($rootDirectory . '/composer.json') ? $rootDirectory . '/composer.json' : null;
+        return $this->factory->createComposer($this->io, $localConfigPath);
     }
 }

@@ -1,4 +1,4 @@
-[
+{"packages": [
     {
         "name": "test/bin",
         "version": "dev-relative-symlinks",
@@ -15,4 +15,4 @@
         "type": "library",
         "installation-source": "dist"
     }
-]
+]}
